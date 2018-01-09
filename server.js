@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-
+const exphbs = require("express-handlebars");
 const axios = require("axios");
 const cheerio = require("cheerio");
 
@@ -11,10 +11,15 @@ const PORT = 8080;
 
 const app = express();
 
+//Handlebars
+app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
+app.set('view engine', 'handlebars');
+
 //Middleware
+const path = require("path");
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, 'public')));
 
 mongoose.Promise = Promise;
 mongoose.connect("mongodb://localhost/articleScrapes", {
@@ -22,33 +27,48 @@ mongoose.connect("mongodb://localhost/articleScrapes", {
 });
 
 // Scrape route
+let pages = 2;
+
+app.get("/", function(request, response) {
+
+	response.render("home");
+});
+
 app.get("/scrape", function(req, res) {
-	axios.get("https://www.wired.com/most-recent/").then(function(response) {
-		let $ = cheerio.load(response.data);
-		$("li.archive-item-component div.archive-item-component__info").each(function(i, element) {
-			var result = [];
-			result.title = $(this)
-				.children("a.archive-item-component__link")
-				.children("h2")
-				.text();
-			result.link = $(this)
-				.children("a.archive-item-component__link")
-				.attr("href");
-			result.summary = $(this)
-				.children("a.archive-item-component__link")
-				.children("p")
-				.text()
+	for (let i = 1; i <= pages; i++) {
+		axios.get(`https://www.wired.com/most-recent/page/${i}/`).then(function(response) {
+			let $ = cheerio.load(response.data);
+			$("li.archive-item-component div.archive-item-component__info").each(function(i, element) {
+				let result = [];
+				result.title = $(this)
+					.children("a.archive-item-component__link")
+					.children("h2")
+					.text();
+				result.link = $(this)
+					.children("a.archive-item-component__link")
+					.attr("href");
+				result.summary = $(this)
+					.children("a.archive-item-component__link")
+					.children("p")
+					.text();
+				db.Article.create(result)
+					.then(function(dbArticle) {
 
-			console.log(result)
+					})
+					.catch(function(err) {
+						res.json(err);
+					});
+				console.log(result)
 
-		})
-	})
-})
+			});
+		});
+	}
+});
 
 // All article route
 app.get("/articles", function(req, res) {
 	db.Article.find({}).then(function(dbArticle) {
-			res.json(dbArticle);
+			res.render("home", dbArticle);
 		})
 		.catch(function(err) {
 			res.json(err);
