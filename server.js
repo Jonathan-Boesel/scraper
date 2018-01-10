@@ -27,7 +27,7 @@ mongoose.connect("mongodb://localhost/articleScrapes", {
 });
 
 // Scrape route
-let pages = 2;
+let pages = 1;
 
 app.get("/", function(request, response) {
 
@@ -35,11 +35,12 @@ app.get("/", function(request, response) {
 });
 
 app.get("/scrape", function(req, res) {
-	for (let i = 1; i <= pages; i++) {
-		axios.get(`https://www.wired.com/most-recent/page/${i}/`).then(function(response) {
-			let $ = cheerio.load(response.data);
+
+	for (let p = 1; p <= pages; p++) {
+		axios.get(`https://www.wired.com/most-recent/page/${p}/`).then(function(response) {
+			var $ = cheerio.load(response.data);
 			$("li.archive-item-component div.archive-item-component__info").each(function(i, element) {
-				let result = [];
+				var result = {};
 				result.title = $(this)
 					.children("a.archive-item-component__link")
 					.children("h2")
@@ -51,29 +52,62 @@ app.get("/scrape", function(req, res) {
 					.children("a.archive-item-component__link")
 					.children("p")
 					.text();
-				db.Article.create(result)
-					.then(function(dbArticle) {
+				console.log(result)
+				db.Article
+					.create(result)
+					.then(function(data) {
 
+						console.log(data);
 					})
 					.catch(function(err) {
 						res.json(err);
 					});
-				console.log(result)
+
 
 			});
 		});
 	}
+	res.send("Scrape Complete");
 });
 
 // All article route
 app.get("/articles", function(req, res) {
-	db.Article.find({}).then(function(dbArticle) {
-			res.render("home", dbArticle);
+	db.Article.find({}).then(function(data) {
+			res.render("home", { data: data });
 		})
 		.catch(function(err) {
 			res.json(err);
 		});
 });
+
+//SAVE route
+app.put("/saved/:id", function(req, res) {
+	db.Article.findByIdAndUpdate(req.params.id, { $set: { saved: true } }, function(err, dbArticle) {
+		if (err) throw err;
+		res.send(dbArticle);
+	});
+})
+
+//Render saved page route
+app.get("/saved", function(req, res) {
+	db.Article.find({ saved: true }, function(err, data) {
+			if (err) throw err;
+			res.render("saved", { data: data })
+		})
+		.catch(function(err) {
+			res.json(err);
+		});
+})
+
+//Delete from saved route, need to figure out reload
+app.put("/delete/:id", function(req, res) {
+	db.Article.findByIdAndUpdate(req.params.id, { $set: { saved: false } })
+
+		.then(function(err, data) {
+			if (err) throw err;
+			res.redirect('back')
+		})
+})
 
 // Find article by id route
 app.get("/articles/:id", function(req, res) {

@@ -1,12 +1,21 @@
-const mongoose = require("mongoose");
+var mongoose = require("mongoose");
 
-const Schema = mongoose.Schema;
+var Schema = mongoose.Schema;
 
-const ArticleSchema = new Schema({
+var ArticleSchema = new Schema({
 	title: {
 		type: String,
 		required: true,
 		unique: true
+		// validate: {
+		// 	validator: function(v, cb) {
+		// 		Article.find({ name: v }, function(err, docs) {
+		// 			if (err) throw err;
+		// 			cb(docs.length == 0);
+		// 		})
+		// 	},
+		// 	message: 'User already exists!'
+		// }
 	},
 	summary: {
 		type: String,
@@ -16,12 +25,22 @@ const ArticleSchema = new Schema({
 		type: String,
 		required: true
 	},
+	saved: {
+		type: Boolean,
+		default: false
+	},
 	note: {
 		type: Schema.Types.ObjectId,
 		ref: "Note"
 	}
 });
 
-const Article = mongoose.model("Article", ArticleSchema);
+//This custom method breaks my schema, I have no idea why
+// ArticleSchema.methods.save = function() {
+// 	this.saved = true;
+// 	return this.saved;
+// };
+
+var Article = mongoose.model("Article", ArticleSchema);
 
 module.exports = Article;
