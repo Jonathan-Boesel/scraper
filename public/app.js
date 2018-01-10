@@ -59,3 +59,17 @@ $(document).on("click", "#scrape", function() {
             console.log("click")
         })
 })
+$(function() {
+    $(document).on("click", ".note", function() {
+        event.preventDefault();
+        let id = ($(this).data("id"))
+        $(".bootbox").removeClass("hide")
+    })
+})
+
+$(function() {
+    $(document).on("click", ".close", function() {
+        event.preventDefault();
+        $(".bootbox").addClass("hide")
+    })
+})

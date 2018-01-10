@@ -1,0 +1,24 @@
+.modal-content {
+	background-color: white;
+	border-radius: 5px;
+	padding: 20px;
+}
+
+p {
+	color: red;
+}
+
+@media only screen and (max-width: 768px) {
+	#whiteSpace {
+		display: none;
+	}
+
+	main {
+		height: 100vh;
+		background-size: auto 100vh;
+	}
+
+	.hero-head {
+		font-size: 1.25em;
+	}
+}
