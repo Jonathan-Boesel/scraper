@@ -103,6 +103,7 @@ let getNotes = function(id) {
 $(function() {
     $(document).on("click", "#saveNote", function() {
         let id = ($(this).data("noteid"))
+        console.log(id)
         console.log($("#noteText").val())
         $.ajax({
                 method: "POST",
@@ -127,6 +128,7 @@ $(function() {
 $(function() {
     $(document).on("click", ".note-delete", function() {
         let id = ($(this).data("deleteid"))
+        console.log(id)
         $.ajax({
                 method: "PUT",
                 url: "/deleteNote/" + id
