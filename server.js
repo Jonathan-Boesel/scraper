@@ -109,11 +109,23 @@ app.put("/delete/:id", function(req, res) {
 		})
 })
 
+//Delete note
+app.put("/deleteNote/:id", function(req, res) {
+	db.Note.findByIdAndRemove(req.params.id)
+		.then(function(err, data) {
+			if (err) throw err
+			res.json(data)
+		})
+		.catch(function(err) {
+			res.json(err);
+		});
+})
+
 // Find article by id route
 app.get("/articles/:id", function(req, res) {
 	db.Article.findOne({ _id: req.params.id })
-		.populate("note").then(function(dbArticle) {
-			res.json(db.Article);
+		.populate("note").then(function(data) {
+			res.json(data);
 		})
 		.catch(function(err) {
 			res.json(err);
@@ -122,11 +134,12 @@ app.get("/articles/:id", function(req, res) {
 
 // Save/update Note
 app.post("/articles/:id", function(req, res) {
+	console.log(req.body.id)
 	db.Note.create(req.body).then(function(dbNote) {
-			return db.Article.findOneAndUpdate({ _id: req.params.id }, { note: dbNote._id }, { new: true });
+			return db.Article.findOneAndUpdate({ _id: req.body.id }, { note: dbNote._id }, { new: true });
 		})
-		.then(function(dbArticle) {
-			res.json(dbArticle);
+		.then(function(data) {
+			res.json(data);
 		})
 		.catch(function(err) {
 			res.json(err);

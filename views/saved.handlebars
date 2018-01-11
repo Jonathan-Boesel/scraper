@@ -25,10 +25,6 @@
 		</div>
 	</div>
 
-	<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#noteModal">
- 				 		Launch demo modal
-					</button>
-
 	<div class="container-fluid article-results">
 		{{#each data}}
 		<div class="panel panel-default">
@@ -36,9 +32,6 @@
 				<a class="panel-title" href="https://www.wired.com{{link}}" target="_blank">{{title}}</a>
 				<div class="btn-group pull-right">
 					<a href="#" class="btn btn-default btn-sm delete" data-id={{id}}>DELETE FROM SAVED</a>
-					<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#noteModal">
- 				 		Launch demo modal
-					</button>
 					<a href="#" data-toggle="modal" data-target="#myModal" class="btn btn-default btn-sm note" data-id={{id}}>ADD NOTE</a>
 				</div>
 
@@ -56,11 +49,11 @@
 				<div class="modal-body"><button type="button" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true" style="margin-top: -10px;">×</button>
 					<div class="bootbox-body">
 						<div class="container-fluid text-center">
-							<h4>Notes For Article: {{id}}</h4>
+							<h4>Notes For Article: <span id="noteID"></span></h4>
 							<hr>
 							<ul class="list-group note-container">
-								<li class="list-group-item">No notes for this article yet.</li>
-							</ul><textarea placeholder="New Note" rows="4" cols="60"></textarea><button class="btn btn-success save">Save Note</button></div>
+								<li class="list-group-item defualt">No notes for this article yet.</li>
+							</ul><textarea id="noteText" placeholder="New Note" rows="4" cols="60"></textarea><button class="btn btn-success" id="saveNote" data-noteid="">Save Note</button></div>
 					</div>
 				</div>
 			</div>
